@@ -29,7 +29,7 @@ class LlavaVisionModel:
         self.image_processor = CLIPImageProcessor.from_pretrained(vision_path)
 
         # self.vision_tower = CLIPVisionModel.from_pretrained(vision_path).half()
-        self.vision_tower = CLIPVisionModel.from_pretrained(vision_path, torch_dtype='auto')  # btnkij
+        self.vision_tower = CLIPVisionModel.from_pretrained(vision_path, torch_dtype='auto').half()  # btnkij
 
         self.vision_tower.requires_grad_(False)
         self.device = torch.device('cpu')
@@ -45,9 +45,9 @@ class LlavaVisionModel:
                 for k, v in d.items():
                     if 'model.mm_projector' in k:
                         # self.projector_weights[k] = v.half()
-                        self.projector_weights[k] = v  # btnkij
+                        self.projector_weights[k] = v.half()  # btnkij
                     elif 'model.vision_tower.vision_tower.vision_model' in k:  # btnkij
-                        vision_tower_weights[k[len('model.vision_tower.vision_tower.'):]] = v
+                        vision_tower_weights[k[len('model.vision_tower.vision_tower.'):]] = v.half()
         self.vision_tower.load_state_dict(vision_tower_weights)
 
         assert 'model.mm_projector.0.weight' in self.projector_weights
